@@ -1,0 +1,19 @@
+# Arquivos compilados do Java
+*.class
+/bin/
+/target/
+
+# Configurações locais do Eclipse
+.metadata/
+.classpath
+.project
+.settings/
+
+# Arquivos pesados (Aplicativos)
+*.apk
+*.app
+*.ipa
+
+# Pasta de evidências locais
+# (Se quiser mostrar uma evidência no GitHub, suba a imagem manualmente no README)
+/evidencias/
