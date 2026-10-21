@@ -29,12 +29,16 @@ public class CatalogoPage {
     }
 
     public void acessarCarrinho() {
-    // 1. Pausa estratégica de 1 segundo para a animação do item sendo adicionado terminar
+    // 1. Pausa para a animação do "Add to cart" finalizar
     try { Thread.sleep(1000); } catch (Exception e) {}
     
-    // 2. Clica no ícone do carrinho no cabeçalho superior direito (ID: cartIV)
+    // 2. Clica no RelativeLayout (cartRL) que é o botão real, e não apenas na imagem
     wait.until(ExpectedConditions.elementToBeClickable(
-        AppiumBy.id("com.saucelabs.mydemoapp.android:id/cartIV"))).click();
+        AppiumBy.id("com.saucelabs.mydemoapp.android:id/cartRL"))).click();
+        
+    // 3. Pausa para aguardar a tela do carrinho carregar completamente
+    try { Thread.sleep(1500); } catch (Exception e) {}
+
 
     
     
