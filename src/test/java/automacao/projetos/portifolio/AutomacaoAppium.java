@@ -1,6 +1,7 @@
 package automacao.projetos.portifolio;
 
 import org.junit.jupiter.api.Disabled;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.options.UiAutomator2Options;
+import io.qameta.allure.Allure; // Importação adicionada para o relatório visual
 
 public class AutomacaoAppium {
 
@@ -27,22 +29,25 @@ public class AutomacaoAppium {
     private PagamentoPage pagamentoPage;
     private RevisaoPage RevisaoPage;
 
-    @BeforeEach 
-    
+    @BeforeEach
     public void setUp() throws Exception {
         UiAutomator2Options options = new UiAutomator2Options();
         options.setPlatformName("Android");
         options.setAutomationName("UiAutomator2");
-        options.setUdid("RX8T10NQ7FR"); 
-        options.setDeviceName("MeuCelularFisico"); 
         
-     // Atenção: Altere este caminho para o local onde o APK está salvo na sua máquina
-        options.setApp("C:\\Users\\David\\Downloads\\mda-2.2.0-25.apk"); 
-        options.setNoReset(false); 
+        // CONFIGURAÇÃO CLOUD-READY: 
+        // 1. Removemos o UDID físico para o Appium aceitar o Emulador do GitHub Actions
+        options.setDeviceName("Android Emulator");
+
+        // 2. Caminho dinâmico: Funciona no Windows e no Linux automaticamente
+        String caminhoApp = new File("src/test/resources/apps/mda-2.2.0-25.apk").getAbsolutePath();
+        options.setApp(caminhoApp);
+        
+        options.setNoReset(false);
 
         URL url = URI.create("http://127.0.0.1:4723/").toURL();
         driver = new AndroidDriver(url, options);
-        
+
         // Inicializa a nossa página de login
         loginPage = new LoginPage(driver);
         catalogoPage = new CatalogoPage(driver);
@@ -55,11 +60,7 @@ public class AutomacaoAppium {
     @Test
     public void deveRealizarLoginComSucesso() {
         loginPage.acessarMenuLogin();
-        
-        // "bod@example.com" é um usuário padrão aceito pelo My Demo App
         loginPage.realizarLogin("bod@example.com", "10203040");
-        
-        // Validação (Assert) do JUnit para confirmar o sucesso
         Assertions.assertTrue(loginPage.verificarSeLogou(), "O login deveria ter sido efetuado com sucesso!");
     }
 
@@ -67,106 +68,85 @@ public class AutomacaoAppium {
     @Test
     public void naoDeveLogarComCredenciaisIncorretas() {
         loginPage.acessarMenuLogin();
-        
-        // Tentamos logar com dados inválidos
         loginPage.realizarLogin("usuario_errado@example.com", "senha123");
-        
-        // O app vai nos jogar para a tela inicial silenciosamente. 
-        // Vamos validar se a opção "Log In" continua no menu (provando que a sessão não foi iniciada)
         boolean naoLogou = loginPage.verificarSeMenuLoginAindaExiste();
-        
-        // Validação: Tem que ser TRUE. Se for falso, o app aceitou a senha errada (Bug Crítico!)
         Assertions.assertTrue(naoLogou, "Atenção: O usuário conseguiu logar com credenciais inválidas!");
     }
-    
+
     @Test
     public void deveRealizarCompraCompletaComSucesso() {
-        // 1. Navegação: Clica na mochila na tela inicial
+        System.out.println("Clicando no produto mochila");
         catalogoPage.selecionarProdutoMochila();
-        
-        // 2. Ação: Adiciona ao carrinho e navega para o carrinho
+
+        System.out.println("Adicionando mochila ao carrinho");
         catalogoPage.adicionarAoCarrinho();
+        System.out.println("Acessando carrinho");
         catalogoPage.acessarCarrinho();
-        
-        // 3. Coleta de Dados: Lê o que está na tela do carrinho
+
+        System.out.println("Confirmando informações de nome e preço do produto");
         String nomeProduto = carrinhoPage.obterNomeProduto();
         String precoProduto = carrinhoPage.obterPrecoProduto();
-        
-        // 4. Validação Inicial (Asserts): Confirma se o item certo foi pro carrinho
+
+        System.out.println("Validando se os dados do produto selecionado está correto");
         Assertions.assertTrue(nomeProduto.contains("Backpack"), "Erro: O nome do produto no carrinho está incorreto!");
         Assertions.assertEquals("$ 29.99", precoProduto, "Erro: O preço diverge do esperado!");
-        
-        // 5. Checkout: Processar a compra
-        // NOTA: Certifique-se de ter criado o método processarCompra() dentro do CarrinhoPage.java
+
+        System.out.println("Processando a compra");
         carrinhoPage.processarCompra();
-        
-     // 5. Interrupção do fluxo: Efetua o Login Obrigatório
+
         System.out.println("App solicitou autenticação. Realizando login...");
         loginPage.realizarLogin("bod@example.com", "10203040");
-        
-     // 6. Preenche a tela de endereço
-        checkoutPage.preencherDadosDeEntrega(
-            "Seu Nome", 
-            "Rua da Automação, 123", 
-            "São Paulo", 
-            "01000-000", 
-            "Brasil"
-        );
-        
-        // 7. Avança para a tela de pagamento
+
+        System.out.println("Realizando preenchimento dinâmico do formulário");
+        checkoutPage.preencherDadosDeEntrega("Seu Nome", "Rua da Automação, 123", "São Paulo", "01000-000", "Brasil");
+
+        System.out.println("Ir para a tela de pagamento");
         checkoutPage.irParaPagamento();
-        
-     // 8. Preenche a tela de Pagamento
-        pagamentoPage.preencherDadosPagamento(
-            "David Silva", 
-            "325812657568789", 
-            "03/30", 
-            "123"
-        );
-        
-        // 9. Avança para a revisão do pedido (Review Order)
+
+        System.out.println("Preencher dados para pagamento");
+        pagamentoPage.preencherDadosPagamento("David Silva", "325812657568789", "03/30", "123");
+
+        System.out.println("Avançar para tela de revisão do pedido");
         pagamentoPage.revisarPedido();
-        
-     // 10. Revisa e finaliza a compra (Place Order)
+
+        System.out.println("Confirmar compra");
         RevisaoPage.confirmarPedido();
-        
-        // 11. Validação Final: Verifica se a tela de sucesso apareceu!
+
+        System.out.println("Validando tela de sucesso");
         String mensagemFinal = RevisaoPage.obterMensagemSucesso();
         Assertions.assertTrue(mensagemFinal.contains("Complete"), "Erro: A compra não foi finalizada com sucesso!");
-        
-        //12. Clicar em Continue Shopping 
+
+        System.out.println("Clicar em Continue Shopping");
         RevisaoPage.continueShopping();
-        
-      //13. Validar home com a mensagem "Products"
+
+        System.out.println("Validando a mensagem Products");
         RevisaoPage.obterMensagemProdutos();
-    
-    
     }
-    
-   
+
     @AfterEach
     public void tearDown() {
         if (driver != null) {
             System.out.println("Tirando screenshot da tela final...");
             try {
-                // 1. Tira o print e guarda na memória temporária
+                // 1. Tira o print em formato de bytes (melhor para o Allure) e arquivo (para a pasta local)
+                byte[] screenshotBytes = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
                 File print = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-                
-                // 2. Cria uma pasta chamada "evidencias" no seu projeto e define o nome do arquivo
+
+                // 2. Salva localmente na pasta evidencias
                 Path destino = Paths.get("evidencias", "evidencia_teste.png");
                 Files.createDirectories(destino.getParent());
-                
-                // 3. Salva o arquivo na pasta
                 Files.copy(print.toPath(), destino, StandardCopyOption.REPLACE_EXISTING);
                 System.out.println("Screenshot salvo com sucesso em: " + destino.toAbsolutePath());
-                
+
+                // 3. ANEXA A IMAGEM DIRETAMENTE NO ALLURE REPORT!
+                Allure.addAttachment("Screenshot da Tela", new ByteArrayInputStream(screenshotBytes));
+
             } catch (Exception e) {
                 System.out.println("Erro ao salvar a evidência: " + e.getMessage());
             }
-            
+
             System.out.println("Fechando o aplicativo e encerrando sessão...");
-            
-    }
+            driver.quit();
+        }
     }
 }
-
