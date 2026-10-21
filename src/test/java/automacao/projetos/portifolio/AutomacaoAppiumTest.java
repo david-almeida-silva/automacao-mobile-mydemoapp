@@ -19,7 +19,7 @@ import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.options.UiAutomator2Options;
 import io.qameta.allure.Allure; // Importação adicionada para o relatório visual
 
-public class AutomacaoAppium {
+public class AutomacaoAppiumTest {
 
     private AndroidDriver driver;
     private LoginPage loginPage;
