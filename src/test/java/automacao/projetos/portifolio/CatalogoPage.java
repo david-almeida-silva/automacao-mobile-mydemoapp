@@ -29,9 +29,13 @@ public class CatalogoPage {
     }
 
     public void acessarCarrinho() {
-        // Clica no ícone do carrinho no canto superior direito
-        wait.until(ExpectedConditions.elementToBeClickable(
-            AppiumBy.id("com.saucelabs.mydemoapp.android:id/cartIV"))).click();
+    // 1. Pausa estratégica de 1 segundo para a animação do item sendo adicionado terminar
+    try { Thread.sleep(1000); } catch (Exception e) {}
+    
+    // 2. Clica no ícone do carrinho no cabeçalho superior direito (ID: cartIV)
+    wait.until(ExpectedConditions.elementToBeClickable(
+        AppiumBy.id("com.saucelabs.mydemoapp.android:id/cartIV"))).click();
+
     
     
     

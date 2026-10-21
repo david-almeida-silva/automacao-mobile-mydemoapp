@@ -28,8 +28,9 @@ public class CarrinhoPage {
     }
     
     public void processarCompra() {
-        // Clica no ícone do carrinho no canto superior direito
-        wait.until(ExpectedConditions.elementToBeClickable(
-            AppiumBy.id("com.saucelabs.mydemoapp.android:id/cartBt"))).click();
+    // Clica no botão grande "Proceed To Checkout" na tela do carrinho
+    wait.until(ExpectedConditions.elementToBeClickable(
+        AppiumBy.id("com.saucelabs.mydemoapp.android:id/cartBt"))).click();
+
 }
 }    
