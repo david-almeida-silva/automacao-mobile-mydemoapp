@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.Duration; // Importação necessária para o setAppWaitDuration
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import java.net.URI;
@@ -17,7 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.options.UiAutomator2Options;
-import io.qameta.allure.Allure; // Importação adicionada para o relatório visual
+import io.qameta.allure.Allure;
 
 public class AutomacaoAppiumTest {
 
@@ -36,14 +37,17 @@ public class AutomacaoAppiumTest {
         options.setAutomationName("UiAutomator2");
         
         // CONFIGURAÇÃO CLOUD-READY: 
-        // 1. Removemos o UDID físico para o Appium aceitar o Emulador do GitHub Actions
         options.setDeviceName("Android Emulator");
 
-        // 2. Caminho dinâmico: Funciona no Windows e no Linux automaticamente
+        // Caminho dinâmico: Funciona no Windows e no Linux automaticamente
         String caminhoApp = new File("src/test/resources/apps/mda-2.2.0-25.apk").getAbsolutePath();
         options.setApp(caminhoApp);
         
         options.setNoReset(false);
+
+        // CONFIGURAÇÕES DE ESTABILIDADE PARA NUVEM:
+        options.setAppWaitActivity("*"); // Diz ao Appium para não travar esperando uma activity específica
+        options.setAppWaitDuration(Duration.ofSeconds(40)); // Dá 40 segundos de tolerância para o app abrir
 
         URL url = URI.create("http://127.0.0.1:4723/").toURL();
         driver = new AndroidDriver(url, options);

@@ -17,7 +17,7 @@ public class CatalogoPage {
 
     public void selecionarProdutoMochila() {
         // Clica na mochila usando a estratégia nativa do Android (Mais rápido)
-    	wait.until(ExpectedConditions.elementToBeClickable(
+        wait.until(ExpectedConditions.elementToBeClickable(
                 AppiumBy.androidUIAutomator("new UiSelector().resourceId(\"com.saucelabs.mydemoapp.android:id/productIV\").instance(0)")
             )).click();
         }
@@ -29,21 +29,15 @@ public class CatalogoPage {
     }
 
     public void acessarCarrinho() {
-    // 1. Pausa para a animação do "Add to cart" finalizar
-    try { Thread.sleep(1000); } catch (Exception e) {}
-    
-    // 2. Clica no RelativeLayout (cartRL) que é o botão real, e não apenas na imagem
-    wait.until(ExpectedConditions.elementToBeClickable(
-        AppiumBy.id("com.saucelabs.mydemoapp.android:id/cartRL"))).click();
+        // 1. Pausa alargada para garantir que a animação de adição ao carrinho finaliza
+        try { Thread.sleep(2000); } catch (Exception e) {}
         
-    // 3. Pausa para aguardar a tela do carrinho carregar completamente
-    try { Thread.sleep(1500); } catch (Exception e) {}
-
-
-    
-    
-    
-        
+        // 2. Utiliza XPath para garantir o clique exato no elemento do ícone do carrinho
+        wait.until(ExpectedConditions.visibilityOfElementLocated(
+            AppiumBy.xpath("//android.widget.ImageView[@resource-id='com.saucelabs.mydemoapp.android:id/cartIV']")
+        )).click();
+            
+        // 3. Pausa para aguardar o carregamento do ecrã do carrinho
+        try { Thread.sleep(2000); } catch (Exception e) {}
     }
-    
 }
