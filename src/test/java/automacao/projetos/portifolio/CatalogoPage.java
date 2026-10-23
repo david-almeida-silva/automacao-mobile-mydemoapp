@@ -23,9 +23,12 @@ public class CatalogoPage {
         }
 
     public void adicionarAoCarrinho() {
-        // Clica no botão azul "Add to Cart"
+        // Rola a tela para baixo até encontrar o botão azul e então clica
         wait.until(ExpectedConditions.elementToBeClickable(
-            AppiumBy.id("com.saucelabs.mydemoapp.android:id/cartBt"))).click();
+            AppiumBy.androidUIAutomator(
+                "new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().resourceId(\"com.saucelabs.mydemoapp.android:id/cartBt\"))"
+            )
+        )).click();
     }
 
     public void acessarCarrinho() {
