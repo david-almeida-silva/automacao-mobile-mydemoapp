@@ -31,8 +31,11 @@ public class CheckoutPage {
     }
 
     public void irParaPagamento() {
-        // Clica no botão "To Payment" na parte inferior da tela
+        // Rola a tela para baixo até encontrar o botão de pagamento e então clica
         wait.until(ExpectedConditions.elementToBeClickable(
-            AppiumBy.id("com.saucelabs.mydemoapp.android:id/paymentBtn"))).click();
+            AppiumBy.androidUIAutomator(
+                "new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().resourceId(\"com.saucelabs.mydemoapp.android:id/paymentBtn\"))"
+            )
+        )).click();
     }
 }
