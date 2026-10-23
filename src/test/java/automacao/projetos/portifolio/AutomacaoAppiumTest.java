@@ -19,6 +19,8 @@ import org.junit.jupiter.api.Test;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.options.UiAutomator2Options;
 import io.qameta.allure.Allure;
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 
 public class AutomacaoAppiumTest {
 
@@ -69,6 +71,8 @@ public class AutomacaoAppiumTest {
     }
 
     @Disabled("Bug crítico (Ticket-001): O app versão 2.2.0 aceita credenciais inválidas e efetua o login.")
+    @Issue("TICKET-001")
+    @Description("Valida o bloqueio de login com senha incorreta. Atualmente desabilitado pois o app possui uma falha de segurança (falso positivo) ao validar credenciais no backend.")
     @Test
     public void naoDeveLogarComCredenciaisIncorretas() {
         loginPage.acessarMenuLogin();
